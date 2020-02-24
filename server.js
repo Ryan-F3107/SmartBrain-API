@@ -2,6 +2,7 @@ const express = require('express');
 
 const app = express(); //we run express
 
+app.use(express.json());
 const database = {
 	users: [
 	{
