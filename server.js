@@ -68,19 +68,21 @@ app.get('/profile/:id', (req,res) => { // :id is the taken parameter
 })
 
 //update user to increase their entry count
+app.put('/image', (req,res) => {
+	const {id} = req.body;
+	var found = false;
+	database.users.forEach(user => {
+		if(user.id === id) {
+			found = true;
+			user.entries++;
+			return res.json(user.entries);
+		}
+	})
+	if(!found){
+		res.status(404).json('No such user');
+	}
+})
 
 app.listen(3000, () =>{
 	console.log('app is running on port 3000');// message after port 3000 is run
 });
-
-
-
-
-/* When we send a password, we would want it to be sent through the body so its more secure
-We would be creating these end points
- --> res = this is working
- /signin --> POST request, respond with a success /fail
- /register --> POST = user
- /profile/:userID --> GET  = user (return the user)
- /image --> PUT Since we update a score -->user, return the updated user counter
-*/
