@@ -25,7 +25,7 @@ const database = {
 }
 
 app.get('/', (req, res) => { //in root
-	res.send("This is working"); //can send a json or string
+	res.send(database.users); //can send a json or string, see what users we have
 })
 
 // start with the signin endpoint
@@ -38,6 +38,19 @@ app.post('/signin', (req,res) => {
 	else{
 		res.status(400).json('error logging in');
 	}
+})
+
+app.post('/register', (req,res) => {
+	const {email, name, password} = req.body;
+	database.users.push({
+		id: '125',
+		name: name,
+		email: email,
+		password: password,
+		entries: 0, //track score
+		joined: new Date() 
+	})
+	res.json(database.users[database.users.length - 1]);
 })
 
 
