@@ -53,6 +53,21 @@ app.post('/register', (req,res) => {
 	res.json(database.users[database.users.length - 1]);
 })
 
+app.get('/profile/:id', (req,res) => { // :id is the taken parameter
+	const {id} = req.params;
+	var found = false;
+	database.users.forEach(user => {
+		if(user.id === id) {
+			found = true;
+			return res.json(user);
+		}
+	})
+	if(!found){
+		res.status(404).json('No such user');
+	}
+})
+
+//update user to increase their entry count
 
 app.listen(3000, () =>{
 	console.log('app is running on port 3000');// message after port 3000 is run
