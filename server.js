@@ -1,6 +1,7 @@
 const express = require('express');
 
 const app = express(); //we run express
+const bcrypt = require('bcrypt-nodejs')
 
 app.use(express.json());
 const database = {
@@ -42,6 +43,11 @@ app.post('/signin', (req,res) => {
 
 app.post('/register', (req,res) => {
 	const {email, name, password} = req.body;
+	//convert password into hash using bcrypt.
+	bcrypt.hash(password, null, null, function(err, hash) {
+		console.log(hash);
+	    // Store hash in your password DB.
+	});
 	database.users.push({
 		id: '125',
 		name: name,
@@ -82,6 +88,15 @@ app.put('/image', (req,res) => {
 		res.status(404).json('No such user');
 	}
 })
+
+
+// Load hash from your password DB.
+// bcrypt.compare("bacon", hash, function(err, res) {
+//     // res == true
+// });
+// bcrypt.compare("veggies", hash, function(err, res) {
+//     // res = false
+// });
 
 app.listen(3000, () =>{
 	console.log('app is running on port 3000');// message after port 3000 is run
