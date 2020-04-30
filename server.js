@@ -3,17 +3,19 @@ const express = require('express');
 const app = express(); //we run express
 const bcrypt = require('bcrypt-nodejs')
 const cors = require('cors');
-const knex = require('knex')({
+const db = require('knex')({ // db is the data base from postgresql 
   client: 'pg',
   connection: {
     host : '127.0.0.1',
     user : 'postgres',
-    password : '',
+    password : 'test',
     database : 'smartbrain'
   }
 });
 
-console.log(knex.select('*').from('users'));
+db.select('*').from('users').then(data => {
+	console.log(data);
+});
 
 app.use(express.json());
 app.use(cors());
@@ -70,13 +72,11 @@ app.post('/register', (req,res) => {
 		console.log(hash);
 	    // Store hash in your password DB.
 	});
-	database.users.push({
-		id: '125',
-		name: name,
+	db('users').insert({
 		email: email,
-		entries: 0, //track score
-		joined: new Date() 
-	})
+		name: name,
+		joined: new Date()
+	}).then(console.log)
 	res.json(database.users[database.users.length - 1]);
 })
 
