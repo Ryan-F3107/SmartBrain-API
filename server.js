@@ -3,6 +3,17 @@ const express = require('express');
 const app = express(); //we run express
 const bcrypt = require('bcrypt-nodejs')
 const cors = require('cors');
+const knex = require('knex')({
+  client: 'pg',
+  connection: {
+    host : '127.0.0.1',
+    user : 'postgres',
+    password : '',
+    database : 'smartbrain'
+  }
+});
+
+console.log(knex.select('*').from('users'));
 
 app.use(express.json());
 app.use(cors());
