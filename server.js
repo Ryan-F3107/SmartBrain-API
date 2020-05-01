@@ -3,7 +3,9 @@ const express = require('express');
 const app = express(); //we run express
 const bcrypt = require('bcrypt-nodejs')
 const cors = require('cors');
-const db = require('knex')({ // db is the data base from postgresql 
+const knex = require('knex');
+
+const db =knex({ // db is the data base from postgresql 
   client: 'pg',
   connection: {
     host : '127.0.0.1',
@@ -19,28 +21,28 @@ db.select('*').from('users').then(data => {
 
 app.use(express.json());
 app.use(cors());
-const database = {
-	users: [
-	{
-		id: '123',
-		name: 'John',
-		password: 'cookies',
-		email: 'john@gmail.com',
-		password: 'cookies',
-		entries: 0, //track score
-		joined: new Date() //create a date when the part gets executed
-	},
-	{
-		id: '124',
-		name: 'Ryan',
-		password: 'Lion',
-		email: 'ryansmith@gmail.com',
-		password: 'banana',
-		entries: 0, //track score
-		joined: new Date()
-	}
-	]
-}
+// const database = {
+// 	users: [
+// 	{
+// 		id: '123',
+// 		name: 'John',
+// 		password: 'cookies',
+// 		email: 'john@gmail.com',
+// 		password: 'cookies',
+// 		entries: 0, //track score
+// 		joined: new Date() //create a date when the part gets executed
+// 	},
+// 	{
+// 		id: '124',
+// 		name: 'Ryan',
+// 		password: 'Lion',
+// 		email: 'ryansmith@gmail.com',
+// 		password: 'banana',
+// 		entries: 0, //track score
+// 		joined: new Date()
+// 	}
+// 	]
+// }
 
 app.get('/', (req, res) => { //in root
 	res.send(database.users); //can send a json or string, see what users we have
@@ -68,16 +70,22 @@ app.post('/signin', (req,res) => {
 app.post('/register', (req,res) => {
 	const {email, name, password} = req.body;
 	//convert password into hash using bcrypt.
-	bcrypt.hash(password, null, null, function(err, hash) {
-		console.log(hash);
-	    // Store hash in your password DB.
-	});
-	db('users').insert({
-		email: email,
-		name: name,
-		joined: new Date()
-	}).then(console.log)
-	res.json(database.users[database.users.length - 1]);
+	// bcrypt.hash(password, null, null, function(err, hash) {
+	// 	console.log(hash);
+	//     // Store hash in your password DB.
+	// });
+	db('users')
+		.returning('*') //instead of using a select statment, we can return all
+		.insert({ //taken from knex documentary, insert category  
+			email: email,
+			name: name,
+			joined: new Date()
+		})
+		.then(user => { //if success 
+			res.json(user[0]); // we return user as an object and we only return one user hence 0.	
+		})
+		.catch(err => res.status(400).json('unable to join')) //if any error occurs, don't give out any information to black haters.
+	
 })
 
 app.get('/profile/:id', (req,res) => { // :id is the taken parameter
