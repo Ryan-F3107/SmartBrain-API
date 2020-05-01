@@ -21,28 +21,28 @@ db.select('*').from('users').then(data => {
 
 app.use(express.json());
 app.use(cors());
-// const database = {
-// 	users: [
-// 	{
-// 		id: '123',
-// 		name: 'John',
-// 		password: 'cookies',
-// 		email: 'john@gmail.com',
-// 		password: 'cookies',
-// 		entries: 0, //track score
-// 		joined: new Date() //create a date when the part gets executed
-// 	},
-// 	{
-// 		id: '124',
-// 		name: 'Ryan',
-// 		password: 'Lion',
-// 		email: 'ryansmith@gmail.com',
-// 		password: 'banana',
-// 		entries: 0, //track score
-// 		joined: new Date()
-// 	}
-// 	]
-// }
+const database = {
+	users: [
+	{
+		id: '123',
+		name: 'John',
+		password: 'cookies',
+		email: 'john@gmail.com',
+		password: 'cookies',
+		entries: 0, //track score
+		joined: new Date() //create a date when the part gets executed
+	},
+	{
+		id: '124',
+		name: 'Ryan',
+		password: 'Lion',
+		email: 'ryansmith@gmail.com',
+		password: 'banana',
+		entries: 0, //track score
+		joined: new Date()
+	}
+	]
+}
 
 app.get('/', (req, res) => { //in root
 	res.send(database.users); //can send a json or string, see what users we have
@@ -50,14 +50,6 @@ app.get('/', (req, res) => { //in root
 
 // start with the signin endpoint
 app.post('/signin', (req,res) => {
-	// 	// Load hash from your password DB.
-	// bcrypt.compare("bacon", hash, function(err, res) {
-	//     // res == true
-	// });
-	// bcrypt.compare("veggies", hash, function(err, res) {
-	//     // res = false
-	// });
-	//compare value given in POSTMAN with the value hardcoded in our "database".
 	if(req.body.email == database.users[0].email && 
 		req.body.password == database.users[0].password) {
 		res.json(database.users[0]);
