@@ -21,58 +21,60 @@ const db =knex({ // db is the data base from postgresql
 
 app.use(express.json());
 app.use(cors());
-const database = {
-	users: [
-	{
-		id: '123',
-		name: 'John',
-		password: 'cookies',
-		email: 'john@gmail.com',
-		password: 'cookies',
-		entries: 0, //track score
-		joined: new Date() //create a date when the part gets executed
-	},
-	{
-		id: '124',
-		name: 'Ryan',
-		password: 'Lion',
-		email: 'ryansmith@gmail.com',
-		password: 'banana',
-		entries: 0, //track score
-		joined: new Date()
-	}
-	]
-}
-
 app.get('/', (req, res) => { //in root
 	res.send(database.users); //can send a json or string, see what users we have
 })
 
 // start with the signin endpoint
 app.post('/signin', (req,res) => {
-	if(req.body.email == database.users[0].email && 
-		req.body.password == database.users[0].password) {
-		res.json(database.users[0]);
-	}
-	else{
-		res.status(400).json('error logging in');
-	}
+	db.select('email','hash').from('login')
+		.where('email', '=', req.body.email)
+		.then(data => {
+			const isValid = bcrypt.compareSync(req.body.password, data[0].hash);
+			if(isValid){
+				return db.select('*').from('users')
+				.where('email', '=', req.body.email)
+				.then(user => {
+					res.json(user[0])
+				})
+				.catch(err => res.status(400).json('unable to get user'))
+			}	//end of if statement
+			else {res.status(400).json("wrong credentials")
+		}
+		})
+		.catch(err => res.status(400).json("wrong credentials"))
 })
 
 app.post('/register', (req,res) => {
 	const {email, name, password} = req.body;
-	db('users')
-		.returning('*') //instead of using a select statment, we can return all
-		.insert({ //taken from knex documentary, insert category  
-			email: email,
-			name: name,
-			joined: new Date()
-		})
-		.then(user => { //if success 
-			res.json(user[0]); // we return user as an object and we only return one user hence 0.	
-		})
+	// Synchronise way of bcrypt is used, additional Javascript code won't be execute until bcrypt finishes
+	const hash = bcrypt.hashSync(password);
+		db.transaction(trx => {	//taken from transaction chapter in knex documentation, we use a transaction when we have to do more things than once
+			//we use trx instead of db, to do the operations
+			trx.insert({
+				hash: hash,
+				email: email
+			})
+			.into('login')	// we first update the login table
+			.returning('email')
+			.then(loginEmail => {	// we get and use the loginEmail
+				return trx('users')	//we make sure that they are of the same transactions
+					.returning('*') //instead of using a select statment, we can return all
+					.insert({ //taken from knex documentary, insert category  
+						email: loginEmail[0],	//Since we were returning an array.
+						name: name,
+						joined: new Date()
+					})
+					.then(user => { //if success 
+						res.json(user[0]); // we return user as an object and we only return one user hence 0.	
+					})					
+			})	//end of then
+			.then(trx.commit) //if the transactions passed, needed to add it into the table
+			.catch(trx.rollback)	//if anything fails, we roll back.		
+		})	//end of transaction
 		.catch(err => res.status(400).json('unable to join')) //if any error occurs, don't give out any information to black haters.
-})
+})	//end of app.post
+		
 
 app.get('/profile/:id', (req,res) => { // :id is the taken parameter, the part may be needed for future development. A future endpoint
 	const {id} = req.params;
