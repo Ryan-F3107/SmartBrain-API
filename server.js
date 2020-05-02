@@ -15,9 +15,9 @@ const db =knex({ // db is the data base from postgresql
   }
 });
 
-db.select('*').from('users').then(data => {
-	console.log(data);
-});
+// db.select('*').from('users').then(data => {
+// 	console.log(data);
+// });
 
 app.use(express.json());
 app.use(cors());
@@ -61,11 +61,6 @@ app.post('/signin', (req,res) => {
 
 app.post('/register', (req,res) => {
 	const {email, name, password} = req.body;
-	//convert password into hash using bcrypt.
-	// bcrypt.hash(password, null, null, function(err, hash) {
-	// 	console.log(hash);
-	//     // Store hash in your password DB.
-	// });
 	db('users')
 		.returning('*') //instead of using a select statment, we can return all
 		.insert({ //taken from knex documentary, insert category  
@@ -77,37 +72,32 @@ app.post('/register', (req,res) => {
 			res.json(user[0]); // we return user as an object and we only return one user hence 0.	
 		})
 		.catch(err => res.status(400).json('unable to join')) //if any error occurs, don't give out any information to black haters.
-	
 })
 
-app.get('/profile/:id', (req,res) => { // :id is the taken parameter
+app.get('/profile/:id', (req,res) => { // :id is the taken parameter, the part may be needed for future development. A future endpoint
 	const {id} = req.params;
-	var found = false;
-	database.users.forEach(user => {
-		if(user.id === id) {
-			found = true;
-			return res.json(user);
-		}
+	db.select('*').from('users').where({id: id})
+		.then(user => {	//it will return the user
+			if(user.length) { // if the length is one which is also true
+				res.json(user[0])
+			} else {
+				res.status(400).json('Not found')
+			}
 	})
-	if(!found){
-		res.status(404).json('No such user');
-	}
-})
+		.catch(err => res.status(400).json('Error getting user'))
+}) //end of app.get
 
 //update user to increase their entry count
 app.put('/image', (req,res) => {
 	const {id} = req.body;
-	var found = false;
-	database.users.forEach(user => {
-		if(user.id === id) {
-			found = true;
-			user.entries++;
-			return res.json(user.entries);
-		}
-	})
-	if(!found){
-		res.status(404).json('No such user');
-	}
+	//knex is used for the update function, the documentary is used, in the category update and increment
+	db('users').where('id','=',id)	//since its SQL we use = and not ==
+	.increment('entries',1)//we increment the entry by one where id == id
+	.returning('entries')
+	.then(entries => {
+		res.json(entries[0]);
+	})	//end of then
+	.catch(err => res.status(400).json('unable to get entries'))	
 })
 
 
