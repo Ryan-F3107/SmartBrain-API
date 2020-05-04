@@ -1,5 +1,8 @@
 const handleRegister = (req,res, db, bcrypt) => {
 	const {email, name, password} = req.body;
+	if(!email || !name || !password) {	//If left empty, then its false
+		return res.status(400).json('incorrect form submission');
+	}
 	// Synchronise way of bcrypt is used, additional Javascript code won't be execute until bcrypt finishes
 	const hash = bcrypt.hashSync(password);
 		db.transaction(trx => {	//taken from transaction chapter in knex documentation, we use a transaction when we have to do more things than once
