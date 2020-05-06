@@ -5,27 +5,26 @@ const app = new Clarifai.App({
 });
 
 const handleApiCall = (req, res) => {
-	app.models
-		.predict(Clarifai.FACE_DETECT_MODEL, req.body.input)
-		.then(data => {
-			res.json(data);
-		})
-		.catch(err => res.status(400).json('Unable to work with API'))
+  app.models
+    .predict(Clarifai.FACE_DETECT_MODEL, req.body.input)
+    .then(data => {
+      res.json(data);
+    })
+    .catch(err => res.status(400).json('unable to work with API'))
 }
 
 const handleImage = (req, res, db) => {
-	const {id} = req.body;
-	//knex is used for the update function, the documentary is used, in the category update and increment
-	db('users').where('id','=',id)	//since its SQL we use = and not ==
-	.increment('entries',1)//we increment the entry by one where id == id
-	.returning('entries')
-	.then(entries => {
-		res.json(entries[0]);
-	})	//end of then
-	.catch(err => res.status(400).json('unable to get entries'))	
+  const { id } = req.body;
+  db('users').where('id', '=', id)
+  .increment('entries', 1)
+  .returning('entries')
+  .then(entries => {
+    res.json(entries[0]);
+  })
+  .catch(err => res.status(400).json('unable to get entries'))
 }
 
 module.exports = {
-	handleImage,
-	handleApiCall
+  handleImage,
+  handleApiCall
 }
