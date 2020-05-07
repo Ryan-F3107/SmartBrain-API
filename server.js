@@ -24,7 +24,7 @@ app.use(express.json());
 app.use(cors());
 
 app.get('/', (req, res) => { //in root
-	res.send(db.users)}); //can send a json or string, see what users we have.
+	res.send("It is working")}); //can send a json or string, see what users we have.
 
 app.post('/signin', signin.handleSignin(db, bcrypt));	//db, bcrypt runs first and then it takes req and res
 app.post('/register', (req, res) => {register.handleRegister(req, res, db, bcrypt)}); // we add the dependency of whatever handleRegister needs 
