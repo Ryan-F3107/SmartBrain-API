@@ -13,10 +13,8 @@ const image = require('./Controller/image');
 const db =knex({ // db is the data base from postgresql 
   client: 'pg',
   connection: {
-    host : 'postgresql-sinuous-32737',
-    user : 'postgres',
-    password : 'test',
-    database : 'smartbrain'
+    host : 'process.env.DATABASE_URL',
+    ssl: true
   }
 });
 
