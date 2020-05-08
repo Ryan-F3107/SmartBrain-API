@@ -11,7 +11,7 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "node": "^2.0.2"
+    "nodemon": "^2.0.2"
   },
   "dependencies": {
     "bcrypt-nodejs": "0.0.3",
