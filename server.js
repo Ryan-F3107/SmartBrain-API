@@ -9,7 +9,7 @@ const register = require('./Controller/register');
 const signin = require('./Controller/signin');
 const profile = require('./Controller/profile');
 const image = require('./Controller/image');
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = 0;
+//process.env.NODE_TLS_REJECT_UNAUTHORIZED = 0;
 
 const db =knex({ // db is the data base from postgresql 
   client: 'pg',
