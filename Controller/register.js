@@ -28,7 +28,7 @@ const handleRegister = (req,res, db, bcrypt) => {
 			.then(trx.commit) //if the transactions passed, needed to add it into the table
 			.catch(trx.rollback)	//if anything fails, we roll back.		
 		})	//end of transaction
-		.catch(err => res.status(400).json('unable to join')) //if any error occurs, don't give out any information to black haters.
+		.catch(err => res.status(400).json(err)) //if any error occurs, don't give out any information to black haters.
 }	//end of handleRegister.
 
 module.exports = {
