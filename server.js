@@ -15,7 +15,7 @@ const db =knex({ // db is the data base from postgresql
   client: 'pg',
   connection: {
     connectionString : 'process.env.DATABASE_URL',
-    ssl: true
+    ssl: true,
   }
 });
 
